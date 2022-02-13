@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./calculatorButtons.module.css";
-import CalculatorButton from "./CaculatorButton";
+import CalculatorButton from "./CalculatorButton";
 
 const numbers = [
 	"1", "2", "3",
