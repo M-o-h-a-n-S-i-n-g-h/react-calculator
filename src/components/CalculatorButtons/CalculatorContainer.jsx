@@ -23,7 +23,7 @@ const initialState = {
 
 const CalculatorContainer = () => {
 	const [calculatorState, setCalculatorState] = useState(initialState);
-
+	
 	const {
 		previousNumber,
 		currentNumber,
@@ -49,9 +49,9 @@ const CalculatorContainer = () => {
 	}
 	
 	const operatorsHandler = ({ target: { value } }) => {
-		if(!currentNumber && !previousNumber) return calculatorState;
+		if (!currentNumber && !previousNumber) return calculatorState;
 		
-		if(previousNumber && !currentNumber && selectedOperation) {
+		if (previousNumber && !currentNumber && selectedOperation) {
 			setCalculatorState({
 				...calculatorState,
 				selectedOperation: value
@@ -59,7 +59,7 @@ const CalculatorContainer = () => {
 			return;
 		}
 		
-		if(!previousNumber) {
+		if (!previousNumber) {
 			setCalculatorState({
 				...calculatorState,
 				previousNumber: currentNumber,
@@ -92,7 +92,7 @@ const CalculatorContainer = () => {
 	
 	const equals = () => {
 		// Checking if every values are available to calculate
-		if(!previousNumber || !currentNumber || !selectedOperation) return;
+		if (!previousNumber || !currentNumber || !selectedOperation) return;
 		
 		// If every values are available
 		setCalculatorState({
@@ -111,25 +111,25 @@ const CalculatorContainer = () => {
 		const isSquareRoot = (formula === "squareRoot");
 		
 		const getResult = () => {
-			if(isInvert) {
+			if (isInvert) {
 				return (currentNumber * -1)
 			}
-			if(isSquare) {
+			if (isSquare) {
 				return (currentNumber * currentNumber)
 			}
-			if(isSquareRoot) {
+			if (isSquareRoot) {
 				return Math.sqrt(parseInt(currentNumber))
 			}
 		}
 		
-		if(!previousNumber) {
+		if (!previousNumber) {
 			setCalculatorState({
 				...calculatorState,
 				result: getResult().toString(),
 				currentNumber: getResult().toString(),
 			})
 		} else {
-			setCalculatorState(({currentNumber}) => {
+			setCalculatorState(({ currentNumber }) => {
 				return {
 					...calculatorState,
 					currentNumber: (previousNumber && currentNumber) ? getResult().toString() : currentNumber,
@@ -139,9 +139,9 @@ const CalculatorContainer = () => {
 		}
 	}
 	
-
+	
 	const calculateScientificOperators = () => {
-		switch(selectedScientificOperation) {
+		switch (selectedScientificOperation) {
 			case "(+/-)":
 				computeNumbers("invert");
 				break;
@@ -181,7 +181,7 @@ const CalculatorContainer = () => {
 		
 		return output;
 	}
-
+	
 	const getPlaceHolder = (button) => {
 		switch (button) {
 			case "+":
@@ -218,7 +218,7 @@ const CalculatorContainer = () => {
 					{operators.map((operator, index) => (
 						<CalculatorButton
 							key={index}
-							style={{ width: "100px", height: "50px"}}
+							style={{ width: "100px", height: "50px" }}
 							value={operator}
 							onClick={operatorsHandler}
 						>
@@ -228,7 +228,7 @@ const CalculatorContainer = () => {
 				</div>
 			</div>
 			<button
-				onClick={() => setCalculatorState({...calculatorState, scientificMode: !scientificMode})}
+				onClick={() => setCalculatorState({ ...calculatorState, scientificMode: !scientificMode })}
 			>
 				On Scientific Mode
 			</button>
