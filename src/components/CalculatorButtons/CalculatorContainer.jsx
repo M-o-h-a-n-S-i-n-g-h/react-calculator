@@ -11,46 +11,79 @@ const numbers = [
 const operators = ["+", "-", "*", "/"];
 const scientificModeOperators = ["(+/-)", "x²", "√"];
 
+const initialState = {
+	previousNumber: "",
+	currentNumber: "",
+	selectedOperation: null,
+	result: "0",
+	isEquals: false,
+	scientificMode: false,
+	selectedScientificOperation: null
+}
+
 const CalculatorContainer = () => {
-	const [previousNumber, setPreviousNumber] = useState("");
-	const [currentNumber, setCurrentNumber] = useState("");
-	const [selectedOperation, setSelectedOperation] = useState(null);
-	const [result, setResult] = useState("0");
-	const [scientificModeOn, setScientificModeOn] = useState(false);
+	const [calculatorState, setCalculatorState] = useState(initialState);
+
+	const {
+		previousNumber,
+		currentNumber,
+		selectedOperation,
+		result,
+		scientificMode,
+		selectedScientificOperation
+	} = calculatorState;
 	
 	useEffect(() => {
-		calculate();
-	}, [selectedOperation])
+		console.log("came")
+		calculateScientificOperators()
+	}, [selectedScientificOperation])
 	
 	const numbersHandler = ({ target: { value } }) => {
-		setCurrentNumber(currentNumber + value)
-		setResult(currentNumber + value)
+		setCalculatorState(({ currentNumber }) => {
+			return {
+				...calculatorState,
+				currentNumber: (currentNumber + value),
+				result: (currentNumber + value),
+			}
+		})
 	}
-
+	
 	const operatorsHandler = ({ target: { value } }) => {
-		if(selectedOperation) setCurrentNumber("")
+		if(!currentNumber && !previousNumber) return calculatorState;
 		
-		if(!previousNumber) {
-			setPreviousNumber(currentNumber)
-		} else if(previousNumber && currentNumber) {
-			setPreviousNumber(calculate());
-			setResult(calculate());
+		if(previousNumber && !currentNumber && selectedOperation) {
+			setCalculatorState({
+				...calculatorState,
+				selectedOperation: value
+			})
+			return;
 		}
 		
-		setSelectedOperation(value)
-		setCurrentNumber("")
+		if(!previousNumber) {
+			setCalculatorState({
+				...calculatorState,
+				previousNumber: currentNumber,
+				currentNumber: "",
+				selectedOperation: value,
+			})
+		} else {
+			setCalculatorState({
+				...calculatorState,
+				previousNumber: calculate(),
+				result: calculate(),
+				currentNumber: "",
+				selectedOperation: value
+			})
+		}
 	}
 	
 	const scientificOperatorsHandler = ({ target: { value } }) => {
-		setSelectedOperation(value);
-		// setCurrentNumber("")
+		setCalculatorState({ ...calculatorState, selectedScientificOperation: value });
+		calculateScientificOperators();
 	}
 	
 	const setInitialState = () => {
-		setPreviousNumber("")
-		setCurrentNumber("")
-		setResult("0");
-		setSelectedOperation("")
+		setCalculatorState(initialState)
 	}
 	
 	const clearAll = () => {
@@ -58,23 +91,75 @@ const CalculatorContainer = () => {
 	}
 	
 	const equals = () => {
-		if(previousNumber && currentNumber) {
-			calculate();
+		// Checking if every values are available to calculate
+		if(!previousNumber || !currentNumber || !selectedOperation) return;
+		
+		// If every values are available
+		setCalculatorState({
+			...calculatorState,
+			selectedOperation: null,
+			currentNumber: "",
+			result: calculate(),
+			previousNumber: "",
+			isEquals: true
+		})
+	}
+	
+	const computeNumbers = (formula) => {
+		const isInvert = (formula === "invert");
+		const isSquare = (formula === "square");
+		const isSquareRoot = (formula === "squareRoot");
+		
+		const getResult = () => {
+			if(isInvert) {
+				return (currentNumber * -1)
+			}
+			if(isSquare) {
+				return (currentNumber * currentNumber)
+			}
+			if(isSquareRoot) {
+				return Math.sqrt(parseInt(currentNumber))
+			}
 		}
 		
-		if(selectedOperation && !currentNumber) return;
-		if(!selectedOperation) return;
-		
-		setResult(calculate());
-		setPreviousNumber(calculate());
-		setCurrentNumber("");
-		setSelectedOperation("");
+		if(!previousNumber) {
+			setCalculatorState({
+				...calculatorState,
+				result: getResult().toString(),
+				currentNumber: getResult().toString(),
+			})
+		} else {
+			setCalculatorState(({currentNumber}) => {
+				return {
+					...calculatorState,
+					currentNumber: (previousNumber && currentNumber) ? getResult().toString() : currentNumber,
+					result: (previousNumber && currentNumber) ? getResult().toString() : currentNumber,
+				}
+			})
+		}
+	}
+	
+
+	const calculateScientificOperators = () => {
+		switch(selectedScientificOperation) {
+			case "(+/-)":
+				computeNumbers("invert");
+				break;
+			case "x²":
+				computeNumbers("square")
+				break;
+			case "√":
+				computeNumbers("squareRoot")
+				break;
+			default:
+				return calculatorState;
+		}
 	}
 	
 	const calculate = () => {
 		let output;
-		const firstOperand = parseFloat(previousNumber);
-		const secondOperand = parseFloat(currentNumber);
+		const firstOperand = parseInt(previousNumber);
+		const secondOperand = parseInt(currentNumber);
 		
 		switch (selectedOperation) {
 			case "+":
@@ -88,24 +173,6 @@ const CalculatorContainer = () => {
 				break;
 			case "/":
 				output = firstOperand / secondOperand;
-				break;
-			case "(+/-)":
-				if(!firstOperand && !secondOperand) return;
-				
-				if(firstOperand) setPreviousNumber((firstOperand * -1).toString())
-				
-				if(secondOperand) setCurrentNumber((secondOperand * -1).toString())
-
-				if(result) {
-					setResult((result * -1).toString());
-					output = (result * -1).toString();
-				}
-				
-				setSelectedOperation("");
-				break;
-			case "x²":
-				break;
-			case "√":
 				break;
 			default:
 				output = "0";
@@ -132,8 +199,8 @@ const CalculatorContainer = () => {
 	
 	return (
 		<div>
-			<h3 style={{ display: "flex", justifyContent: "flex-end" }}>
-				{result}
+			<h3 style={{ display: "flex", justifyContent: "flex-end", fontSize: "44px" }}>
+				{result || "0"}
 			</h3>
 			<div style={{ display: "flex" }}>
 				<div className={styles.buttonsLayout}>
@@ -160,10 +227,12 @@ const CalculatorContainer = () => {
 					))}
 				</div>
 			</div>
-			<button onClick={() => setScientificModeOn(prevState => !prevState)}>
+			<button
+				onClick={() => setCalculatorState({...calculatorState, scientificMode: !scientificMode})}
+			>
 				On Scientific Mode
 			</button>
-			{scientificModeOn && (
+			{(
 				<div className="scientificButtons">
 					{scientificModeOperators.map((operator, index) => (
 						<CalculatorButton
