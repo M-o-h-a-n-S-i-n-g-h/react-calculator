@@ -1,0 +1,53 @@
+.numberButtonsLayout {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(4, 50px);
+  grid-gap: 10px;
+  margin: 0 10px 10px 0;
+}
+
+.scientificNumbersLayout {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  font-size: 1rem;
+}
+
+.calculatorLayout {
+  display: flex;
+}
+
+.result {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 2.5em;
+  font-weight: normal;
+  margin-bottom: 5px;
+  border: solid .5px black;
+  word-break: break-all;
+  width: 430px;
+  text-align: left;
+  padding: 10px;
+}
+
+.scientificOperatorsAndToggleButton {
+  display: flex;
+}
+
+.scientificOperatorsAndToggleButton > button {
+  margin-right: 10px;
+}
+
+.scientificOperatorsAndToggleButton > button:last-of-type {
+  margin-right: 0;
+}
+
+.scientificToggleButton {
+  margin-left: auto;
+  margin-right: 0;
+  width: 100px;
+  height: 50px;
+}

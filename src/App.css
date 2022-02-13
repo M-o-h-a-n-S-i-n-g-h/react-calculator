@@ -23,14 +23,27 @@
   color: #fff;
 }
 
+.lightAndDarkThemeButtons {
+  width: fit-content;
+  padding: 1em 3em;
+}
+
 button {
   background: #f0f0f0;
   border: solid 1px darkgray;
   cursor: pointer;
+  color: black;
 }
 
 button:hover {
   transform: scale(1.05);
+}
+
+.themeButtons {
+  display: grid;
+  place-items: center;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1em;
 }
 
 .App-logo {
