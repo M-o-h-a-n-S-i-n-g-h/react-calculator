@@ -1,20 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./calculatorButtons.module.css";
 import CalculatorButton from "./CaculatorButton";
 
 const numbers = [
-	"1",
-	"2",
-	"3",
-	"4",
-	"5",
-	"6",
-	"7",
-	"8",
-	"9",
-	"Clear",
-	"0",
-	"=",
+	"1", "2", "3",
+	"4", "5", "6",
+	"7", "8", "9",
+	"Clear", "0", "=",
 ];
 const operators = ["+", "-", "*", "/"];
 const scientificModeOperators = ["(+/-)", "x²", "√"];
@@ -38,13 +30,7 @@ const CalculatorContainer = () => {
 		selectedOperation,
 		result,
 		scientificMode,
-		selectedScientificOperation,
 	} = calculatorState;
-
-	useEffect(() => {
-		console.log("came");
-		calculateScientificOperators();
-	}, [selectedScientificOperation]);
 
 	const numbersHandler = ({ target: { value } }) => {
 		setCalculatorState(({ currentNumber }) => {
@@ -86,11 +72,7 @@ const CalculatorContainer = () => {
 	};
 
 	const scientificOperatorsHandler = ({ target: { value } }) => {
-		setCalculatorState({
-			...calculatorState,
-			selectedScientificOperation: value,
-		});
-		calculateScientificOperators();
+		calculateScientificOperators(value);
 	};
 
 	const setInitialState = () => {
@@ -129,7 +111,7 @@ const CalculatorContainer = () => {
 				return currentNumber * currentNumber;
 			}
 			if (isSquareRoot) {
-				return Math.sqrt(parseInt(currentNumber));
+				return Math.sqrt(Number(currentNumber));
 			}
 		};
 
@@ -156,8 +138,8 @@ const CalculatorContainer = () => {
 		}
 	};
 
-	const calculateScientificOperators = () => {
-		switch (selectedScientificOperation) {
+	const calculateScientificOperators = (operation) => {
+		switch (operation) {
 			case "(+/-)":
 				computeNumbers("invert");
 				break;
@@ -246,7 +228,7 @@ const CalculatorContainer = () => {
 					{operators.map((operator, index) => (
 						<CalculatorButton
 							key={index}
-							style={{ width: "100px", height: "50px" }}
+							style={{ width: "100px", height: "50px", marginBottom: "10px" }}
 							value={operator}
 							onClick={operatorsHandler}
 						>
