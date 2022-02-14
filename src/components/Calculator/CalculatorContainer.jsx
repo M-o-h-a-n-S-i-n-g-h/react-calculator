@@ -5,10 +5,10 @@ import OperatorButtons from "./OperatorButtons";
 import ScientificOperatorButtons from "./ScientificOperatorButtons";
 
 const numbers = [
-	"1", "2", "3",
-	"4", "5", "6",
-	"7", "8", "9",
-	"Clear", "0", "=",
+  "1", "2", "3",
+  "4", "5", "6",
+  "7", "8", "9",
+  "Clear", "0", "=",
 ];
 
 const operators = ["+", "-", "*", "/"];
@@ -16,177 +16,193 @@ const operators = ["+", "-", "*", "/"];
 const scientificModeOperators = ["(+/-)", "x²", "√"];
 
 const initialState = {
-	previousNumber: "",
-	currentNumber: "",
-	selectedOperation: null,
-	result: "0",
-	isEquals: false,
-	scientificMode: false,
-	selectedScientificOperation: null,
+  previousNumber: "",
+  currentNumber: "",
+  selectedOperation: null,
+  result: "0",
+  isEquals: false,
+  scientificMode: false,
+  selectedScientificOperation: null,
 };
 
 const CalculatorContainer = () => {
-	const [calculatorState, setCalculatorState] = useState(initialState);
+  const [calculatorState, setCalculatorState] = useState(initialState);
 
-	const {
-		previousNumber,
-		currentNumber,
-		selectedOperation,
-		result,
-		scientificMode,
-	} = calculatorState;
+  const {
+    previousNumber,
+    currentNumber,
+    selectedOperation,
+    result,
+    scientificMode,
+  } = calculatorState;
 
-	const numbersHandler = ({ target: { value } }) => {
-		if(!currentNumber && !previousNumber && value === "0") return;
+  const numbersHandler = ({ target: { value } }) => {
+    // This function is responsible for adding the numbers to the calculator state when clicked
+    
+    if(!currentNumber && !previousNumber && value === "0") return;
+    
+    if(
+      (previousNumber && value === "0") ||
+      (!currentNumber && value !== 0) ||
+      (currentNumber)
+    ) {
+      setCalculatorState(({ currentNumber }) => {
+        return {
+          ...calculatorState,
+          currentNumber: currentNumber + value,
+          result: currentNumber + value,
+        };
+      });
+    }
+  };
+
+  const operatorsHandler = ({ target: { value } }) => {
+/*
+    This function is responsible for handling operators and sets the result by calling the
+    computing functions
+*/
+    
+    if (!currentNumber && !previousNumber) return calculatorState;
+
+    if (previousNumber && !currentNumber && selectedOperation) {
+      setCalculatorState({
+        ...calculatorState,
+        selectedOperation: value,
+      });
+      return;
+    }
+
+    if (!previousNumber) {
+      setCalculatorState({
+        ...calculatorState,
+        previousNumber: currentNumber,
+        currentNumber: "",
+        selectedOperation: value,
+      });
+    } else {
+      setCalculatorState({
+        ...calculatorState,
+        previousNumber: computeNumbersForBasicOperations(),
+        result: computeNumbersForBasicOperations(),
+        currentNumber: "",
+        selectedOperation: value,
+      });
+    }
+  };
+  
+  const scientificOperatorsHandler = ({ target: { value } }) => {
+    switchScientificOperators(value);
+  };
+  
+  const toggleScientificMode = () => {
+    setCalculatorState({
+      ...calculatorState,
+      scientificMode: !scientificMode,
+    })
+  }
+  
+  const clearAll = () => {
+    setCalculatorState(initialState);
+  };
+
+  const equals = () => {
+		// this function performs equals operator action and sets the result in the state
 		
-		if(
-			(previousNumber && value === "0") ||
-			(!currentNumber && value !== 0) ||
-			(currentNumber)
-		) {
-			setCalculatorState(({ currentNumber }) => {
-				return {
-					...calculatorState,
-					currentNumber: currentNumber + value,
-					result: currentNumber + value,
-				};
-			});
-		}
-	};
+    if (!previousNumber || !currentNumber || !selectedOperation) return;
 
-	const operatorsHandler = ({ target: { value } }) => {
-		if (!currentNumber && !previousNumber) return calculatorState;
-
-		if (previousNumber && !currentNumber && selectedOperation) {
-			setCalculatorState({
-				...calculatorState,
-				selectedOperation: value,
-			});
-			return;
-		}
-
-		if (!previousNumber) {
-			setCalculatorState({
-				...calculatorState,
-				previousNumber: currentNumber,
-				currentNumber: "",
-				selectedOperation: value,
-			});
-		} else {
-			setCalculatorState({
-				...calculatorState,
-				previousNumber: computeNumbersForBasicOperations(),
-				result: computeNumbersForBasicOperations(),
-				currentNumber: "",
-				selectedOperation: value,
-			});
-		}
-	};
-	
-	const scientificOperatorsHandler = ({ target: { value } }) => {
-		switchScientificOperators(value);
-	};
-	
-	const toggleScientificMode = () => {
-		setCalculatorState({
-			...calculatorState,
-			scientificMode: !scientificMode,
-		})
-	}
-	
-	const clearAll = () => {
-		setCalculatorState(initialState);
-	};
-
-	const equals = () => {
-		if (!previousNumber || !currentNumber || !selectedOperation) return;
-
-		setCalculatorState({
-			...calculatorState,
-			selectedOperation: null,
-			currentNumber: computeNumbersForBasicOperations(),
-			result: computeNumbersForBasicOperations(),
-			previousNumber: "",
-		});
-	};
-	
-	const computeNumbersForBasicOperations = () => {
-		let output;
-		const firstOperand = parseInt(previousNumber);
-		const secondOperand = parseInt(currentNumber);
+    setCalculatorState({
+      ...calculatorState,
+      selectedOperation: null,
+      currentNumber: computeNumbersForBasicOperations(),
+      result: computeNumbersForBasicOperations(),
+      previousNumber: "",
+    });
+  };
+  
+  const computeNumbersForBasicOperations = () => {
+		// This function is responsible for computing the result for basic 4 math operations
 		
-		switch (selectedOperation) {
-			case "+":
-				output = firstOperand + secondOperand;
-				break;
-			case "-":
-				output = firstOperand - secondOperand;
-				break;
-			case "*":
-				output = firstOperand * secondOperand;
-				break;
-			case "/":
-				output = firstOperand / secondOperand;
-				break;
-			default:
-				output = "0";
-				break;
-		}
-		
-		return output;
-	};
+    let output;
+    const firstOperand = parseInt(previousNumber);
+    const secondOperand = parseInt(currentNumber);
+    
+    switch (selectedOperation) {
+      case "+":
+        output = firstOperand + secondOperand;
+        break;
+      case "-":
+        output = firstOperand - secondOperand;
+        break;
+      case "*":
+        output = firstOperand * secondOperand;
+        break;
+      case "/":
+        output = firstOperand / secondOperand;
+        break;
+      default:
+        output = "0";
+        break;
+    }
+    
+    return output;
+  };
 
-	const computeNumbersForScientificOperators = (formula) => {
+  const computeNumbersForScientificOperators = (formula) => {
+/*
+		This function is responsible for computing the result for scientific opearations and sets
+		the Calculator State.
+*/
+		
 		const isInvert = (formula === "invert");
-		const isSquare = (formula === "square");
-		const isSquareRoot = (formula === "squareRoot");
+    const isSquare = (formula === "square");
+    const isSquareRoot = (formula === "squareRoot");
 
-		const getResult = () => {
-			if (isInvert) {
-				return result ? (result * -1) : (currentNumber * -1);
-			}
-			if (isSquare) {
-				return result ? (result * result) : (currentNumber * currentNumber);
-			}
-			if (isSquareRoot) {
-				return result ? Math.sqrt(Number(result)) : Math.sqrt(Number(currentNumber));
-			}
-		};
-		
-		let computedResult = isNaN(getResult()) ? "Math Error" : getResult().toString();
+    const getResult = () => {
+      if (isInvert) {
+        return result ? (result * -1) : (currentNumber * -1);
+      }
+      if (isSquare) {
+        return result ? (result * result) : (currentNumber * currentNumber);
+      }
+      if (isSquareRoot) {
+        return result ? Math.sqrt(Number(result)) : Math.sqrt(Number(currentNumber));
+      }
+    };
+    
+    let computedResult = isNaN(getResult()) ? "Math Error" : getResult().toString();
 
-		if (!previousNumber) {
-			setCalculatorState({
-				...calculatorState,
-				result: computedResult,
-				currentNumber: getResult().toString(),
-			});
-		} else if (currentNumber) {
-			setCalculatorState(() => {
-				return {
-					...calculatorState,
-					result: computedResult,
-					currentNumber: getResult().toString()
-				};
-			});
-		}
-	};
-	
-	const switchScientificOperators = (operation) => {
-		switch (operation) {
-			case "(+/-)":
-				computeNumbersForScientificOperators("invert");
-				break;
-			case "x²":
-				computeNumbersForScientificOperators("square");
-				break;
-			case "√":
-				computeNumbersForScientificOperators("squareRoot");
-				break;
-			default:
-				return calculatorState;
-		}
-	};
+    if (!previousNumber) {
+      setCalculatorState({
+        ...calculatorState,
+        result: computedResult,
+        currentNumber: getResult().toString(),
+      });
+    } else if (currentNumber) {
+      setCalculatorState(() => {
+        return {
+          ...calculatorState,
+          result: computedResult,
+          currentNumber: getResult().toString()
+        };
+      });
+    }
+  };
+  
+  const switchScientificOperators = (operation) => {
+    switch (operation) {
+      case "(+/-)":
+        computeNumbersForScientificOperators("invert");
+        break;
+      case "x²":
+        computeNumbersForScientificOperators("square");
+        break;
+      case "√":
+        computeNumbersForScientificOperators("squareRoot");
+        break;
+      default:
+        return calculatorState;
+    }
+  };
 
 	return (
 		<div>

@@ -25,12 +25,21 @@
   justify-content: flex-end;
   font-size: 2.5em;
   font-weight: normal;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
   border: solid .5px black;
   word-break: break-all;
   width: 430px;
   text-align: left;
   padding: 10px;
+}
+
+@media screen and (max-width: 430px) {
+  .result {
+    width: 340px;
+    margin: auto;
+    margin-bottom: 15px;
+
+  }
 }
 
 .scientificOperatorsAndToggleButton {
